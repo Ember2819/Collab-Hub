@@ -1,71 +1,53 @@
-import React, { useState, useEffect } from 'react';
-import { db } from '../../lib/firebase';
-import { collection, query, onSnapshot, addDoc, updateDoc, doc } from 'firebase/firestore';
-import { Plus, CheckCircle2, Clock, AlertCircle } from 'lucide-react';
+import React, { useState } from "react";
 
-const TodoBoard = ({ workspaceId }) => {
-  const [tasks, setTasks] = useState([]);
-  const [newTask, setNewTask] = useState("");
+const TodoBoard = () => {
+  const [todos, setTodos] = useState([]);
+  const [input, setInput] = useState("");
 
-  useEffect(() => {
-    const q = query(collection(db, `workspaces/${workspaceId}/tasks`));
-    const unsubscribe = onSnapshot(q, (snapshot) => {
-      setTasks(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })));
-    });
-    return () => unsubscribe();
-  }, [workspaceId]);
-
-  const addTask = async (e) => {
-    e.preventDefault();
-    if (!newTask) return;
-    await addDoc(collection(db, `workspaces/${workspaceId}/tasks`), {
-      title: newTask,
-      status: 'not-started',
-      priority: 'medium',
-      createdAt: new Date()
-    });
-    setNewTask("");
+  const addTodo = () => {
+    if (input.trim() === "") return;
+    setTodos([...todos, input]);
+    setInput("");
   };
 
-  const toggleStatus = async (taskId, currentStatus) => {
-    const nextStatus = currentStatus === 'finished' ? 'not-started' : 'finished';
-    await updateDoc(doc(db, `workspaces/${workspaceId}/tasks`, taskId), {
-      status: nextStatus
-    });
+  const removeTodo = (index) => {
+    setTodos(todos.filter((_, i) => i !== index));
   };
 
   return (
-    <div className="p-6 bg-dark-800/50 border border-dark-700 rounded-xl backdrop-blur-md">
-      <h2 className="text-xl font-bold mb-4 flex items-center gap-2">
-        <CheckCircle2 className="text-blue-400" /> Team Tasks
-      </h2>
-      
-      <form onSubmit={addTask} className="mb-6 flex gap-2">
-        <input 
-          value={newTask}
-          onChange={(e) => setNewTask(e.target.value)}
-          placeholder="Add a collaborative task..."
-          className="flex-grow bg-dark-900 border border-dark-700 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500/50"
+    <div className="flex flex-col gap-3">
+      <div className="flex gap-2">
+        <input
+          type="text"
+          value={input}
+          onChange={(e) => setInput(e.target.value)}
+          placeholder="Add a todo..."
+          className="flex-1 p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-400"
         />
-        <button type="submit" className="bg-blue-600 p-2 rounded-lg hover:bg-blue-500 transition-all">
-          <Plus />
+        <button
+          onClick={addTodo}
+          className="bg-blue-500 text-white px-4 rounded hover:bg-blue-600 transition"
+        >
+          Add
         </button>
-      </form>
-
-      <div className="space-y-3">
-        {tasks.map(task => (
-          <div 
-            key={task.id}
-            onClick={() => toggleStatus(task.id, task.status)}
-            className={`flex items-center justify-between p-4 rounded-lg border cursor-pointer transition-all ${
-              task.status === 'finished' ? 'bg-dark-900/50 border-green-900/50 opacity-50' : 'bg-dark-900 border-dark-700 hover:border-blue-500/50'
-            }`}
-          >
-            <span className={task.status === 'finished' ? 'line-through' : ''}>{task.title}</span>
-            {task.status === 'finished' ? <CheckCircle2 className="text-green-500" size={18} /> : <Clock className="text-yellow-500" size={18} />}
-          </div>
-        ))}
       </div>
+
+      <ul className="flex flex-col gap-2">
+        {todos.map((todo, index) => (
+          <li
+            key={index}
+            className="bg-gray-100 p-2 rounded flex justify-between items-center"
+          >
+            {todo}
+            <button
+              onClick={() => removeTodo(index)}
+              className="text-red-500 hover:text-red-700"
+            >
+              X
+            </button>
+          </li>
+        ))}
+      </ul>
     </div>
   );
 };
