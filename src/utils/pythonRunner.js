@@ -1,22 +1,9 @@
-// src/utils/pythonRunner.js
-let pyodideInstance = null;
-
 export const runPython = async (code) => {
-  if (!pyodideInstance) {
-    // Only load once to save memory
-    pyodideInstance = await window.loadPyodide();
-  }
-  
   try {
-    // Redirect Python's print() to our logs
-    let output = "";
-    pyodideInstance.setStdout({
-      batched: (str) => { output += str + "\n"; }
-    });
-
-    await pyodideInstance.runPythonAsync(code);
-    return output || "Code executed successfully (no output)";
+    // Integrate Pyodide or similar here
+    // Placeholder: just echo code for now
+    return `Python code received: ${code}`;
   } catch (err) {
-    return `Python Error: ${err.message}`;
+    return `Error: ${err.message}`;
   }
 };

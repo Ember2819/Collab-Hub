@@ -1,20 +1,17 @@
-import { auth, db } from './lib/firebase';
-
-import React from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import Dashboard from './pages/Dashboard';
-import Workspace from './pages/Workspace';
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+import Login from "./pages/Login.jsx";
+import Dashboard from "./pages/Dashboard.jsx";
+import Workspace from "./pages/Workspace.jsx";
 
 function App() {
   return (
-    <Router>
-      <div className="min-h-screen bg-dark-900 text-white selection:bg-blue-500/30">
-        <Routes>
-          <Route path="/" element={<Dashboard />} />
-          <Route path="/workspace/:id" element={<Workspace />} />
-        </Routes>
-      </div>
-    </Router>
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element={<Login />} />
+        <Route path="/dashboard" element={<Dashboard />} />
+        <Route path="/workspace" element={<Workspace />} />
+      </Routes>
+    </BrowserRouter>
   );
 }
 
